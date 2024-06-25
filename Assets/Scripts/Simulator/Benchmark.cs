@@ -29,13 +29,14 @@ namespace Scripts.Simulator {
     // The following offload static components of the TED code...
     using static StaticTables; // non dynamic tables - classic datalog EDB
     using static Variables;
+    using static Wrappers;
 
     public static class Benchmark {
         private const int Seed = 349571286;
         public static Simulation Simulation = null!;
         public static bool RecordingPerformance;
         private static TablePredicate<Person, Location> _whereTheyAre;
-        private static TablePredicate<Person, Person, Interactions.Outcome> _interactedWith;
+        private static TablePredicate<Person, Person, float, float, Interactions.Outcome> _interactedWith;
         private static TablePredicate<Person, Person, float> _affinity;
         private static readonly List<(uint, double)> PerformanceData = new();
 
@@ -56,17 +57,32 @@ namespace Scripts.Simulator {
         // Tables, despite being local or private variables, will be capitalized for style/identification purposes.
 
         public static void InitSimulator() {
-            Location.CreateAll(100);
-            Person.CreateAll(2000);
-            
             Simulation = new Simulation("Benchmark");
             Simulation.Exceptions.Colorize(_ => red);
             Simulation.Problems.Colorize(_ => red);
             Simulation.BeginPredicates();
-            _whereTheyAre = Predicate("WhereTheyAre", person, location);
-            _interactedWith = Predicate("InteractedWith", person, other, outcome);
-            _affinity = Predicate("Affinity", person, other, affinity);
+
+            var Person = Predicate("Person", person);
+            var Location = Predicate("Location", location);
+
+            _affinity = Predicate("Affinity", person.JointKey, other.JointKey, affinity);
+            _affinity.Overwrite = true;
+            var Affinity = Definition("Affinity", person, other, affinity).Is(_affinity | PersonPersonAffinity[person, other, affinity]);
+            
+            _whereTheyAre = Predicate("WhereTheyAre", person.Key, location.Indexed)
+               .If(Person, RandomMood[mood], Maximal(location, affinity, Location & PersonLocationAffinity[person, mood, location, affinity]));
+            _interactedWith = Predicate("InteractedWith", person, other, affinity, otherAffinity, outcome)
+               .If(Person, _whereTheyAre, Maximal(other, affinity, _whereTheyAre[other, location] & Affinity[person, other, affinity]),
+                   Affinity[other, person, otherAffinity], Interact[person, other, affinity, otherAffinity, outcome]);
+            
+            //affinity + ActorOutcome[outcome] in place of total in Add[...]
+            _affinity.Add[person, other, total].If(_interactedWith, total == affinity + ActorOutcome[outcome]);
+            _affinity.Add[person, other, total].If(_interactedWith[other, person, __, affinity, outcome], total == affinity + OtherOutcome[outcome]);
+            
             Simulation.EndPredicates();
+            
+            Person.AddRows(Enumerable.Range(0, 2000).Select(s => new Person("Bob", $"Mc{s}", RngForInitialization)));
+            Location.AddRows(Enumerable.Range(0, 100).Select(s => new Location($"{s}")));
         }
 
         public static readonly Stopwatch Stopwatch = new Stopwatch();
@@ -75,25 +91,17 @@ namespace Scripts.Simulator {
             Tick();
             Stopwatch.Reset();
             Stopwatch.Start();
-            Person.UpdateEveryone(ClockTick % 2 == 1);
+            Simulation.Update();
             Stopwatch.Stop();
-            
-            if (RecordingPerformance) {
-                PerformanceData.Add((ClockTick - InitialClockTick, Stopwatch.Elapsed.TotalMilliseconds));
-                if (ClockTick % 100 == 1) {
-                    using var file = AppendText("PerformanceData.csv");
-                    foreach ((var clock, var execution) in PerformanceData)
-                        file.WriteLine($"{clock}, {execution}");
-                    PerformanceData.Clear();
-                }
+
+            if (!RecordingPerformance) return;
+            PerformanceData.Add((ClockTick - InitialClockTick, Stopwatch.Elapsed.TotalMilliseconds));
+            if (ClockTick % 100 == 1) {
+                using var file = AppendText("PerformanceData.csv");
+                foreach ((var clock, var execution) in PerformanceData)
+                    file.WriteLine($"{clock}, {execution}");
+                PerformanceData.Clear();
             }
-            
-            _whereTheyAre.Clear();
-            _whereTheyAre.AddRows(Person.Everyone.Select(p => (p, p.Location)));
-            _interactedWith.Clear();
-            _interactedWith.AddRows(Person.Everyone.Select(p => (p, p.Other, p.Outcome)));
-            _affinity.Clear();
-            _affinity.AddRows(Person.Everyone.SelectMany(p => p.Affinity.Select(pair => (p, pair.Key, pair.Value))));
         }
     }
 }

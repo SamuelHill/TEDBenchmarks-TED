@@ -15,7 +15,10 @@ namespace Scripts.Simulator {
         public static readonly Var<Location> location = (Var<Location>)"location";
         public static readonly Var<Person> person = (Var<Person>)"person";
         public static readonly Var<Person> other = (Var<Person>)"other";
+        public static readonly Var<float> total = (Var<float>)"total";
         public static readonly Var<float> affinity = (Var<float>)"affinity";
+        public static readonly Var<float> otherAffinity = (Var<float>)"otherAffinity";
+        public static readonly Var<Fingerprint> mood = (Var<Fingerprint>)"mood";
         public static readonly Var<Interactions.Outcome> outcome = (Var<Interactions.Outcome>)"outcome";
 
     }
