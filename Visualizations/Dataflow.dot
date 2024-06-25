@@ -1,0 +1,14 @@
+digraph {
+splines=true
+node [ style="filled"]
+subgraph "cluster_FirstNames"{
+v0 [ label = "FirstNames" fillcolor="gold" shape="diamond"];
+v1 [ label = "Initially" fillcolor="deepskyblue" shape="diamond"];
+}
+v2 [ label = "FemaleNames" fillcolor="gold" shape="diamond"];
+v3 [ label = "MaleNames" fillcolor="gold" shape="diamond"];
+v4 [ label = "Surnames" fillcolor="gold" shape="diamond"];
+v1 -> v0 [ color="blue" ]
+v2 -> v1 [ constraint="false" ]
+v3 -> v1 [ constraint="false" ]
+}
