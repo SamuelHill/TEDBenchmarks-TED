@@ -58,16 +58,13 @@ namespace Scripts.Simulator {
 
         public static void InitSimulator() {
             Simulation = new Simulation("Benchmark");
-            Simulation.Exceptions.Colorize(_ => red);
-            Simulation.Problems.Colorize(_ => red);
             Simulation.BeginPredicates();
 
             var Person = Predicate("Person", person);
             var Location = Predicate("Location", location);
             var WorkLocation = Predicate("WorkLocation", person, location);
 
-            _affinity = Predicate("Affinity", person, other, affinity);
-            _affinity.JointKey(person, other);
+            _affinity = Predicate("Affinity", person, other, affinity).JointKey(person, other);
             _affinity.Overwrite = true;
             var Affinity = Definition("Affinity", person, other, affinity).Is(FirstOf[_affinity, PersonPersonAffinity[person, other, affinity]]);
 
@@ -79,20 +76,12 @@ namespace Scripts.Simulator {
                .If(Person, _whereTheyAre, Maximal(other, affinity, _whereTheyAre[other, location] & Affinity[person, other, affinity]),
                    Affinity[other, person, otherAffinity], Interact[person, other, affinity, otherAffinity, outcome]);
             
-            //affinity + ActorOutcome[outcome] in place of total in Add[...]
-            _affinity.Add[person, other, total].If(_interactedWith, total == affinity + ActorOutcome[outcome]);
-            _affinity.Add[person, other, total].If(_interactedWith[other, person, __, affinity, outcome], total == affinity + OtherOutcome[outcome]);
-            
+            _affinity.Add[person, other, affinity + ActorOutcome[outcome]].If(_interactedWith);
+            _affinity.Add[person, other, affinity + OtherOutcome[outcome]].If(_interactedWith[other, person, __, affinity, outcome]);
             Simulation.EndPredicates();
 
             Simulation.Compile("Scripts.Simulator",
-                additionalDeclarations: new []
-                {
-                    "using Scripts.ValueTypes;",
-                    "using static Scripts.ValueTypes.Interactions;",
-                    "using static Scripts.Simulator.Wrappers;"
-                });
-
+                additionalDeclarations: new [] { "using Scripts.ValueTypes;", "using static Scripts.ValueTypes.Interactions;", "using static Scripts.Simulator.Wrappers;" });
             TED.Compiler.Compiler.Link(Simulation, true);
             
             Person.AddRows(Enumerable.Range(0, 2000).Select(s => new Person("Bob", $"Mc{s}", RngForInitialization)));

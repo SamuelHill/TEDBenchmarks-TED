@@ -203,14 +203,14 @@ namespace Scripts.Simulator
         }
         public static void Affinity__add__CompiledUpdate()
         {
-            // Affinity__add[in person,in other,in total].If(InteractedWith[out person,out other,out affinity,out otherAffinity,out outcome], total == affinity+ActorOutcome(outcome))
+            // Affinity__add[in person,in other,in temp0].If(InteractedWith[out person,out other,out affinity,out otherAffinity,out outcome], temp0 == affinity+ActorOutcome(outcome))
             {
                 Person person;
                 Person other;
                 float affinity;
                 float otherAffinity;
                 Outcome outcome;
-                float total;
+                float temp0;
 
                 // InteractedWith[out person,out other,out affinity,out otherAffinity,out outcome]
                 var row__0 = unchecked((uint)-1);
@@ -223,24 +223,24 @@ namespace Scripts.Simulator
                 otherAffinity = data__0.Item4;
                 outcome = data__0.Item5;
 
-                // total == affinity+ActorOutcome(outcome)
-                total = affinity+(ActorOutcomeImplementation(outcome));
+                // temp0 == affinity+ActorOutcome(outcome)
+                temp0 = affinity+(ActorOutcomeImplementation(outcome));
 
-                // Write [in person,in other,in total]
-                Affinity__add.Add((person,other,total));
+                // Write [in person,in other,in temp0]
+                Affinity__add.Add((person,other,temp0));
                 goto restart__0;
             }
 
             rule2:;
 
-            // Affinity__add[in person,in other,in total].If(InteractedWith[out other,out person,out _Single0,out affinity,out outcome], total == affinity+OtherOutcome(outcome))
+            // Affinity__add[in person,in other,in temp1].If(InteractedWith[out other,out person,out _Single0,out affinity,out outcome], temp1 == affinity+OtherOutcome(outcome))
             {
                 Person other;
                 Person person;
                 float _Single0;
                 float affinity;
                 Outcome outcome;
-                float total;
+                float temp1;
 
                 // InteractedWith[out other,out person,out _Single0,out affinity,out outcome]
                 var row__0 = unchecked((uint)-1);
@@ -253,11 +253,11 @@ namespace Scripts.Simulator
                 affinity = data__0.Item4;
                 outcome = data__0.Item5;
 
-                // total == affinity+OtherOutcome(outcome)
-                total = affinity+(OtherOutcomeImplementation(outcome));
+                // temp1 == affinity+OtherOutcome(outcome)
+                temp1 = affinity+(OtherOutcomeImplementation(outcome));
 
-                // Write [in person,in other,in total]
-                Affinity__add.Add((person,other,total));
+                // Write [in person,in other,in temp1]
+                Affinity__add.Add((person,other,temp1));
                 goto restart__0;
             }
 
