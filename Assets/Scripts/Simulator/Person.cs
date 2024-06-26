@@ -6,6 +6,8 @@ namespace Scripts.ValueTypes {
     /// <summary>
     /// Members of Person that are specific to the C# implementation of the benchmark
     /// </summary>
-    public partial class Person : IComparable<Person>, IEquatable<Person> {
+    public partial class Person : IComparable<Person>, IEquatable<Person>
+    {
+
     }
 }

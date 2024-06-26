@@ -102,6 +102,7 @@ namespace Scripts.Simulator {
         }
 
         public static readonly Stopwatch Stopwatch = new Stopwatch();
+        public static double UpdateTime;
         
         public static void UpdateSimulator() {
             Tick();
@@ -109,6 +110,7 @@ namespace Scripts.Simulator {
             Stopwatch.Start();
             Simulation.Update();
             Stopwatch.Stop();
+            UpdateTime = (15*UpdateTime+Stopwatch.Elapsed.TotalMilliseconds)/16;
 
             if (!RecordingPerformance) return;
             PerformanceData.Add((ClockTick - InitialClockTick, Stopwatch.Elapsed.TotalMilliseconds));

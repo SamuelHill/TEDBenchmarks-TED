@@ -88,6 +88,7 @@ namespace Scripts.Unity {
 
         // ReSharper disable once UnusedMember.Global
         internal void OnGUI() {
+            GUI.Label(new Rect(1800, 20, 500, 500), $"Update {Benchmark.UpdateTime}ms");
             if (!_guiRunOnce) {
                 CustomSkins();
                 InitAllTables();
