@@ -66,7 +66,8 @@ namespace Scripts.Simulator {
             var Location = Predicate("Location", location);
             var WorkLocation = Predicate("WorkLocation", person, location);
 
-            _affinity = Predicate("Affinity", person.JointKey, other.JointKey, affinity);
+            _affinity = Predicate("Affinity", person, other, affinity);
+            _affinity.JointKey(person, other);
             _affinity.Overwrite = true;
             var Affinity = Definition("Affinity", person, other, affinity).Is(_affinity | PersonPersonAffinity[person, other, affinity]);
 
@@ -83,8 +84,15 @@ namespace Scripts.Simulator {
             _affinity.Add[person, other, total].If(_interactedWith[other, person, __, affinity, outcome], total == affinity + OtherOutcome[outcome]);
             
             Simulation.EndPredicates();
-            
-            //Simulation.Compile("Scripts.Simulator");
+
+            Simulation.Compile("Scripts.Simulator",
+                additionalDeclarations: new []
+                {
+                    "using Scripts.ValueTypes;",
+                    "using static Scripts.ValueTypes.Interactions;",
+                    "using static Scripts.Simulator.Wrappers;"
+                });
+
             TED.Compiler.Compiler.Link(Simulation, true);
             
             Person.AddRows(Enumerable.Range(0, 2000).Select(s => new Person("Bob", $"Mc{s}", RngForInitialization)));

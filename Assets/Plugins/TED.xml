@@ -26,6 +26,11 @@
             Name of the table from whose rules this method is compiled.
             </summary>
         </member>
+        <member name="F:TED.Compiler.Compiler.AdditionalDeclarations">
+            <summary>
+            Any additional "using X;", "using static X;", etc. declarations you want to include
+            </summary>
+        </member>
         <member name="M:TED.Compiler.Compiler.WithLiftedScope(System.Action)">
             <summary>
             Compile the code compiled by generator, but move any variables it declares using LocalVariable to the beginning.
