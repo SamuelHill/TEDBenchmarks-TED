@@ -69,7 +69,7 @@ namespace Scripts.Simulator {
             _affinity = Predicate("Affinity", person, other, affinity);
             _affinity.JointKey(person, other);
             _affinity.Overwrite = true;
-            var Affinity = Definition("Affinity", person, other, affinity).Is(_affinity | PersonPersonAffinity[person, other, affinity]);
+            var Affinity = Definition("Affinity", person, other, affinity).Is(FirstOf[_affinity, PersonPersonAffinity[person, other, affinity]]);
 
             _whereTheyAre = Predicate("WhereTheyAre", person.Key, location.Indexed)
                .If(IsAM[false], Person, RandomMood[mood],

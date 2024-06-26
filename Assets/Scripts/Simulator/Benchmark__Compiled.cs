@@ -103,7 +103,7 @@ namespace Scripts.Simulator
         }
         public static void InteractedWith__CompiledUpdate()
         {
-            // InteractedWith[in person,in other,in affinity,in otherAffinity,in outcome].If(Person[out person], WhereTheyAre[in person,out location], Maximal[in other,in affinity,And[TED.Interpreter.Goal[]]], Or[TED.Interpreter.Goal[]], outcome == Interact(person, other, affinity, otherAffinity))
+            // InteractedWith[in person,in other,in affinity,in otherAffinity,in outcome].If(Person[out person], WhereTheyAre[in person,out location], Maximal[in other,in affinity,And[TED.Interpreter.Goal[]]], FirstOf[TED.Interpreter.Goal[]], outcome == Interact(person, other, affinity, otherAffinity))
             {
                 Person person;
                 Location location;
@@ -144,35 +144,22 @@ namespace Scripts.Simulator
                 other = data__2_maxLoop_0.Item1;
                 if (data__2_maxLoop_0.Item2 != location) goto restart__2_maxLoop_0;
 
-                // Or[TED.Interpreter.Goal[]]
-
-                int branch__2_maxLoop_1;
-
-                start0__2_maxLoop_1:
-                branch__2_maxLoop_1 = 0;
+                // FirstOf[TED.Interpreter.Goal[]]
                 // Affinity[in person,in other,out affinity]
                 var row__2_maxLoop_1_0 = Affinity__0_1_key.RowWithKey((person, other));
-                if (row__2_maxLoop_1_0 == Table.NoRow) goto start1__2_maxLoop_1;
+                if (row__2_maxLoop_1_0 == Table.NoRow) goto firstOFBranch1__2_maxLoop_1;
                 ref var data__2_maxLoop_1_0 = ref Affinity.Data[row__2_maxLoop_1_0];
-                if (data__2_maxLoop_1_0.Item1 != person) goto start1__2_maxLoop_1;
-                if (data__2_maxLoop_1_0.Item2 != other) goto start1__2_maxLoop_1;
+                if (data__2_maxLoop_1_0.Item1 != person) goto firstOFBranch1__2_maxLoop_1;
+                if (data__2_maxLoop_1_0.Item2 != other) goto firstOFBranch1__2_maxLoop_1;
                 affinity = data__2_maxLoop_1_0.Item3;
-                goto orSuccess__2_maxLoop_1;
-                start1__2_maxLoop_1:
-                branch__2_maxLoop_1 = 1;
+                goto firstOfSuccess__2_maxLoop_1;
+
+                firstOFBranch1__2_maxLoop_1:
                 // affinity == PersonPersonAffinity(person, other)
                 affinity = PersonPersonAffinityImplementation(person, other);
-                goto orSuccess__2_maxLoop_1;
+                goto firstOfSuccess__2_maxLoop_1;
 
-
-                restartDispatch__2_maxLoop_1:
-                switch (branch__2_maxLoop_1)
-                {
-                    case 0: goto start1__2_maxLoop_1;
-                    case 1: goto restart__2_maxLoop_0;
-                }
-
-                orSuccess__2_maxLoop_1: ;
+                firstOfSuccess__2_maxLoop_1: ;
 
                 if (!gotOne__2 || affinity > bestaffinity__2)
                 {
@@ -180,49 +167,36 @@ namespace Scripts.Simulator
                     bestother__2 = other;
                     bestaffinity__2 = affinity;
                 }
-                goto restartDispatch__2_maxLoop_1;
+                goto restart__2_maxLoop_0;
 
                 maxDone__2:
                 if (!gotOne__2) goto restart__0;
                 other = bestother__2;
                 affinity = bestaffinity__2;
 
-                // Or[TED.Interpreter.Goal[]]
-
-                int branch__3;
-
-                start0__3:
-                branch__3 = 0;
+                // FirstOf[TED.Interpreter.Goal[]]
                 // Affinity[in other,in person,out otherAffinity]
                 var row__3_0 = Affinity__0_1_key.RowWithKey((other, person));
-                if (row__3_0 == Table.NoRow) goto start1__3;
+                if (row__3_0 == Table.NoRow) goto firstOFBranch1__3;
                 ref var data__3_0 = ref Affinity.Data[row__3_0];
-                if (data__3_0.Item1 != other) goto start1__3;
-                if (data__3_0.Item2 != person) goto start1__3;
+                if (data__3_0.Item1 != other) goto firstOFBranch1__3;
+                if (data__3_0.Item2 != person) goto firstOFBranch1__3;
                 otherAffinity = data__3_0.Item3;
-                goto orSuccess__3;
-                start1__3:
-                branch__3 = 1;
+                goto firstOfSuccess__3;
+
+                firstOFBranch1__3:
                 // otherAffinity == PersonPersonAffinity(other, person)
                 otherAffinity = PersonPersonAffinityImplementation(other, person);
-                goto orSuccess__3;
+                goto firstOfSuccess__3;
 
-
-                restartDispatch__3:
-                switch (branch__3)
-                {
-                    case 0: goto start1__3;
-                    case 1: goto restart__0;
-                }
-
-                orSuccess__3: ;
+                firstOfSuccess__3: ;
 
                 // outcome == Interact(person, other, affinity, otherAffinity)
                 outcome = InteractImplementation(person, other, affinity, otherAffinity);
 
                 // Write [in person,in other,in affinity,in otherAffinity,in outcome]
                 InteractedWith.Add((person,other,affinity,otherAffinity,outcome));
-                goto restartDispatch__3;
+                goto restart__0;
             }
 
             end:;
