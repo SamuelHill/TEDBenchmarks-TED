@@ -64,13 +64,16 @@ namespace Scripts.Simulator {
 
             var Person = Predicate("Person", person);
             var Location = Predicate("Location", location);
+            var WorkLocation = Predicate("WorkLocation", person, location);
 
             _affinity = Predicate("Affinity", person.JointKey, other.JointKey, affinity);
             _affinity.Overwrite = true;
             var Affinity = Definition("Affinity", person, other, affinity).Is(_affinity | PersonPersonAffinity[person, other, affinity]);
-            
+
             _whereTheyAre = Predicate("WhereTheyAre", person.Key, location.Indexed)
-               .If(Person, RandomMood[mood], Maximal(location, affinity, Location & PersonLocationAffinity[person, mood, location, affinity]));
+               .If(IsAM[false], Person, RandomMood[mood],
+                   Maximal(location, affinity, Location & PersonLocationAffinity[person, mood, location, affinity]))
+               .If(IsAM[true], WorkLocation);
             _interactedWith = Predicate("InteractedWith", person, other, affinity, otherAffinity, outcome)
                .If(Person, _whereTheyAre, Maximal(other, affinity, _whereTheyAre[other, location] & Affinity[person, other, affinity]),
                    Affinity[other, person, otherAffinity], Interact[person, other, affinity, otherAffinity, outcome]);
@@ -81,8 +84,13 @@ namespace Scripts.Simulator {
             
             Simulation.EndPredicates();
             
+            //Simulation.Compile("Scripts.Simulator");
+            TED.Compiler.Compiler.Link(Simulation, true);
+            
             Person.AddRows(Enumerable.Range(0, 2000).Select(s => new Person("Bob", $"Mc{s}", RngForInitialization)));
             Location.AddRows(Enumerable.Range(0, 100).Select(s => new Location($"{s}")));
+            var locationList = Location.ToArray();
+            WorkLocation.AddRows(Person.Select(p => (p, locationList.RandomElement(RngForInitialization))));
         }
 
         public static readonly Stopwatch Stopwatch = new Stopwatch();
