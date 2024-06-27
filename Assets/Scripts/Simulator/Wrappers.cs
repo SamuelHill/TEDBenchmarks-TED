@@ -33,9 +33,7 @@ namespace Scripts.Simulator {
         
         public static Function<Fingerprint> RandomMood = new(nameof(RandomMood), Fingerprint.Mood, false) {NameForCompilation = "Fingerprint.Mood"};
         
-        // ReSharper disable once InconsistentNaming
         public static bool IsAMImplementation() => Clock.ClockTick % 2 == 1;
-        // NOTE: Could be primitive predicate
         public static Function<bool> IsAM = new(nameof(IsAM), IsAMImplementation) {NameForCompilation = nameof(IsAMImplementation)};
     }
 }

@@ -59,7 +59,6 @@ namespace Scripts.Simulator {
         public static void InitSimulator() {
             Simulation = new Simulation("Benchmark");
             Simulation.BeginPredicates();
-
             var Person = Predicate("Person", person);
             var Location = Predicate("Location", location);
             var WorkLocation = Predicate("WorkLocation", person, location);

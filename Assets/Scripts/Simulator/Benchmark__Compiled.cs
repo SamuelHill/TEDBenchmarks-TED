@@ -120,10 +120,15 @@ namespace Scripts.Simulator
                 person = data__0;
 
                 // WhereTheyAre[in person,out location]
-                var row__1 = WhereTheyAre__0_key.RowWithKey(in person);
+                var row__1 = Table.NoRow;
+                for (var bucket__1=person.GetHashCode()&WhereTheyAre__0_key.Mask; WhereTheyAre__0_key.Buckets[bucket__1].row != Table.NoRow; bucket__1 = (bucket__1+1)&WhereTheyAre__0_key.Mask)
+                    if (WhereTheyAre__0_key.Buckets[bucket__1].key == person)
+                    {
+                        row__1 = WhereTheyAre__0_key.Buckets[bucket__1].row;
+                        break;
+                    }
                 if (row__1 == Table.NoRow) goto restart__0;
                 ref var data__1 = ref WhereTheyAre.Data[row__1];
-                if (data__1.Item1 != person) goto restart__0;
                 location = data__1.Item2;
 
                 // Maximal[in other,in affinity,And[TED.Interpreter.Goal[]]]
@@ -142,15 +147,19 @@ namespace Scripts.Simulator
                 match__2_maxLoop_0:
                 ref var data__2_maxLoop_0 = ref WhereTheyAre.Data[row__2_maxLoop_0];
                 other = data__2_maxLoop_0.Item1;
-                if (data__2_maxLoop_0.Item2 != location) goto restart__2_maxLoop_0;
 
                 // FirstOf[TED.Interpreter.Goal[]]
                 // Affinity[in person,in other,out affinity]
-                var row__2_maxLoop_1_0 = Affinity__0_1_key.RowWithKey((person, other));
+                var key__2_maxLoop_1_0 = (person, other);
+                var row__2_maxLoop_1_0 = Table.NoRow;
+                for (var bucket__2_maxLoop_1_0=key__2_maxLoop_1_0.GetHashCode()&Affinity__0_1_key.Mask; Affinity__0_1_key.Buckets[bucket__2_maxLoop_1_0].row != Table.NoRow; bucket__2_maxLoop_1_0 = (bucket__2_maxLoop_1_0+1)&Affinity__0_1_key.Mask)
+                    if (Affinity__0_1_key.Buckets[bucket__2_maxLoop_1_0].key == key__2_maxLoop_1_0)
+                    {
+                        row__2_maxLoop_1_0 = Affinity__0_1_key.Buckets[bucket__2_maxLoop_1_0].row;
+                        break;
+                    }
                 if (row__2_maxLoop_1_0 == Table.NoRow) goto firstOFBranch1__2_maxLoop_1;
                 ref var data__2_maxLoop_1_0 = ref Affinity.Data[row__2_maxLoop_1_0];
-                if (data__2_maxLoop_1_0.Item1 != person) goto firstOFBranch1__2_maxLoop_1;
-                if (data__2_maxLoop_1_0.Item2 != other) goto firstOFBranch1__2_maxLoop_1;
                 affinity = data__2_maxLoop_1_0.Item3;
                 goto firstOfSuccess__2_maxLoop_1;
 
@@ -176,11 +185,16 @@ namespace Scripts.Simulator
 
                 // FirstOf[TED.Interpreter.Goal[]]
                 // Affinity[in other,in person,out otherAffinity]
-                var row__3_0 = Affinity__0_1_key.RowWithKey((other, person));
+                var key__3_0 = (other, person);
+                var row__3_0 = Table.NoRow;
+                for (var bucket__3_0=key__3_0.GetHashCode()&Affinity__0_1_key.Mask; Affinity__0_1_key.Buckets[bucket__3_0].row != Table.NoRow; bucket__3_0 = (bucket__3_0+1)&Affinity__0_1_key.Mask)
+                    if (Affinity__0_1_key.Buckets[bucket__3_0].key == key__3_0)
+                    {
+                        row__3_0 = Affinity__0_1_key.Buckets[bucket__3_0].row;
+                        break;
+                    }
                 if (row__3_0 == Table.NoRow) goto firstOFBranch1__3;
                 ref var data__3_0 = ref Affinity.Data[row__3_0];
-                if (data__3_0.Item1 != other) goto firstOFBranch1__3;
-                if (data__3_0.Item2 != person) goto firstOFBranch1__3;
                 otherAffinity = data__3_0.Item3;
                 goto firstOfSuccess__3;
 

@@ -89,7 +89,7 @@
             <returns>Expression that computes the vlaue of the pattern (usually a tuple)</returns>
             <exception cref="T:System.InvalidOperationException">If pattern is not fully instantiated</exception>
         </member>
-        <member name="M:TED.Compiler.Compiler.CompilePatternMatch(System.String,TED.Interpreter.IPattern,TED.Compiler.Continuation)">
+        <member name="M:TED.Compiler.Compiler.CompilePatternMatch(System.String,TED.Interpreter.IPattern,TED.Compiler.Continuation,System.Int32[])">
             <summary>
             Emit code to match tupleVar to the specified pattern.
             This will update variables or compare them to tuple values, depending on the read/write modes of the pattern's arguments.
@@ -97,6 +97,7 @@
             <param name="tupleVar">Name of the variable containing the tuple</param>
             <param name="p">Pattern to match the tuple to</param>
             <param name="fail">Where to branch to if the match fails (falls through for success)</param>
+            <param name="ignoreColumns">Columns not to generate matching/storing code for</param>
         </member>
         <member name="M:TED.Compiler.Compiler.CompileMatch(System.String,TED.Interpreter.IMatchOperation,TED.Compiler.Continuation)">
             <summary>
@@ -8567,8 +8568,9 @@
             <typeparam name="TRow">Type of the table rows.  This will be a tuple type unless it's a single-column table</typeparam>
             <typeparam name="TColumn">Type of the column we're indexing by</typeparam>
         </member>
-        <member name="F:TED.Tables.GeneralIndex`2.buckets">
+        <member name="F:TED.Tables.GeneralIndex`2.Buckets">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             Buckets for the hash table.  These contain a column value and the index of the first row in the
             linked list of rows having that column value.  The row after it is stored in nextRow[firstRow].
             Empty buckets have firstRow == AnyTable.NoRow.
@@ -8576,6 +8578,7 @@
         </member>
         <member name="F:TED.Tables.GeneralIndex`2.NextRow">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             Next cells in the linked lists.
             All the rows with a given column value are stored in a linked list, starting with the row indicated
             in the firstRow field of the hashtable bucket for the column value.  The successor to row i is stored in
@@ -8595,8 +8598,9 @@
             We need to track this since it's possible for the table to fill with deletions, making lookups loop infinitely.
             </summary>
         </member>
-        <member name="F:TED.Tables.GeneralIndex`2.mask">
+        <member name="F:TED.Tables.GeneralIndex`2.Mask">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             The length of the buckets array is always a power of 2.  Mask is the length-1, so we can easily
             project a hash value into a bucket number by and'ing the hash value with the mask.
             </summary>
@@ -8697,13 +8701,15 @@
             <typeparam name="TRow">Type of the rows of the table; this will be a tuple type unless it is a single-column table</typeparam>
             <typeparam name="TKey">Type of the column we're indexing on</typeparam>
         </member>
-        <member name="F:TED.Tables.KeyIndex`2.buckets">
+        <member name="F:TED.Tables.KeyIndex`2.Buckets">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             Hash table buckets mapping key values to row numbers
             </summary>
         </member>
-        <member name="F:TED.Tables.KeyIndex`2.mask">
+        <member name="F:TED.Tables.KeyIndex`2.Mask">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             Mask to and with a hash to get a bucket number
             </summary>
         </member>

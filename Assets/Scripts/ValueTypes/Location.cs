@@ -27,7 +27,6 @@ namespace Scripts.ValueTypes {
             string.Compare(_name, other._name, StringComparison.Ordinal);
         public bool Equals(Location other) => other is not null && ReferenceEquals(this, other);
         public override bool Equals(object obj) => obj is not null && ReferenceEquals(this, obj);
-        public override int GetHashCode() => _name.GetHashCode();
 
         public static bool operator ==(Location l1, Location l2) => l1 is not null && l1.Equals(l2);
         public static bool operator !=(Location l1, Location l2) => !(l1 == l2);
