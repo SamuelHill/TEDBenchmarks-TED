@@ -12,6 +12,7 @@ using Scripts.Time;
 using Scripts.Unity;
 using Scripts.Utilities;
 using Scripts.ValueTypes;
+using TMPro;
 using UnityEngine;
 using static TED.Language;
 
@@ -67,12 +68,12 @@ namespace Scripts.Simulator {
             _affinity.Overwrite = true;
             var Affinity = Definition("Affinity", person, other, affinity).Is(FirstOf[_affinity, PersonPersonAffinity[person, other, affinity]]);
 
-            _whereTheyAre = Predicate("WhereTheyAre", person.Key, location.Indexed)
+            _whereTheyAre = Predicate("WhereTheyAre", person, location.Indexed)
                .If(IsAM[false], Person, RandomMood[mood],
                    Maximal(location, affinity, Location & PersonLocationAffinity[person, mood, location, affinity]))
                .If(IsAM[true], WorkLocation);
             _interactedWith = Predicate("InteractedWith", person, other, affinity, otherAffinity, outcome)
-               .If(Person, _whereTheyAre, Maximal(other, affinity, _whereTheyAre[other, location] & Affinity[person, other, affinity]),
+               .If(_whereTheyAre, Maximal(other, affinity, _whereTheyAre[other, location] & Affinity[person, other, affinity]),
                    Affinity[other, person, otherAffinity], Interact[person, other, affinity, otherAffinity, outcome]);
             
             _affinity.Add[person, other, affinity + ActorOutcome[outcome]].If(_interactedWith);

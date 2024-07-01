@@ -103,7 +103,7 @@ namespace Scripts.Simulator
         }
         public static void InteractedWith__CompiledUpdate()
         {
-            // InteractedWith[in person,in other,in affinity,in otherAffinity,in outcome].If(Person[out person], WhereTheyAre[in person,out location], Maximal[in other,in affinity,And[TED.Interpreter.Goal[]]], FirstOf[TED.Interpreter.Goal[]], outcome == Interact(person, other, affinity, otherAffinity))
+            // InteractedWith[in person,in other,in affinity,in otherAffinity,in outcome].If(WhereTheyAre[out person,out location], Maximal[in other,in affinity,And[TED.Interpreter.Goal[]]], FirstOf[TED.Interpreter.Goal[]], outcome == Interact(person, other, affinity, otherAffinity))
             {
                 Person person;
                 Location location;
@@ -112,98 +112,87 @@ namespace Scripts.Simulator
                 float otherAffinity;
                 Outcome outcome;
 
-                // Person[out person]
+                // WhereTheyAre[out person,out location]
                 var row__0 = unchecked((uint)-1);
                 restart__0:
-                if (++row__0 == Person.Length) goto end;
-                ref var data__0 = ref Person.Data[row__0];
-                person = data__0;
-
-                // WhereTheyAre[in person,out location]
-                var row__1 = Table.NoRow;
-                for (var bucket__1=person.GetHashCode()&WhereTheyAre__0_key.Mask; WhereTheyAre__0_key.Buckets[bucket__1].row != Table.NoRow; bucket__1 = (bucket__1+1)&WhereTheyAre__0_key.Mask)
-                    if (WhereTheyAre__0_key.Buckets[bucket__1].key == person)
-                    {
-                        row__1 = WhereTheyAre__0_key.Buckets[bucket__1].row;
-                        break;
-                    }
-                if (row__1 == Table.NoRow) goto restart__0;
-                ref var data__1 = ref WhereTheyAre.Data[row__1];
-                location = data__1.Item2;
+                if (++row__0 == WhereTheyAre.Length) goto end;
+                ref var data__0 = ref WhereTheyAre.Data[row__0];
+                person = data__0.Item1;
+                location = data__0.Item2;
 
                 // Maximal[in other,in affinity,And[TED.Interpreter.Goal[]]]
-                var gotOne__2 = false;
-                var bestother__2 = default(Person);
-                var bestaffinity__2 = default(float);
+                var gotOne__1 = false;
+                var bestother__1 = default(Person);
+                var bestaffinity__1 = default(float);
                 // And[TED.Interpreter.Goal[]]
 
                 // WhereTheyAre[out other,in location]
-                var row__2_maxLoop_0 = WhereTheyAre__1.FirstRowWithValue(in location);
-                if (row__2_maxLoop_0 != Table.NoRow) goto match__2_maxLoop_0;
-                goto maxDone__2;
-                restart__2_maxLoop_0:
-                row__2_maxLoop_0 = WhereTheyAre__1.NextRow[row__2_maxLoop_0];
-                if (row__2_maxLoop_0 == Table.NoRow) goto maxDone__2;
-                match__2_maxLoop_0:
-                ref var data__2_maxLoop_0 = ref WhereTheyAre.Data[row__2_maxLoop_0];
-                other = data__2_maxLoop_0.Item1;
+                var row__1_maxLoop_0 = WhereTheyAre__1.FirstRowWithValue(in location);
+                if (row__1_maxLoop_0 != Table.NoRow) goto match__1_maxLoop_0;
+                goto maxDone__1;
+                restart__1_maxLoop_0:
+                row__1_maxLoop_0 = WhereTheyAre__1.NextRow[row__1_maxLoop_0];
+                if (row__1_maxLoop_0 == Table.NoRow) goto maxDone__1;
+                match__1_maxLoop_0:
+                ref var data__1_maxLoop_0 = ref WhereTheyAre.Data[row__1_maxLoop_0];
+                other = data__1_maxLoop_0.Item1;
 
                 // FirstOf[TED.Interpreter.Goal[]]
                 // Affinity[in person,in other,out affinity]
-                var key__2_maxLoop_1_0 = (person, other);
-                var row__2_maxLoop_1_0 = Table.NoRow;
-                for (var bucket__2_maxLoop_1_0=key__2_maxLoop_1_0.GetHashCode()&Affinity__0_1_key.Mask; Affinity__0_1_key.Buckets[bucket__2_maxLoop_1_0].row != Table.NoRow; bucket__2_maxLoop_1_0 = (bucket__2_maxLoop_1_0+1)&Affinity__0_1_key.Mask)
-                    if (Affinity__0_1_key.Buckets[bucket__2_maxLoop_1_0].key == key__2_maxLoop_1_0)
+                var key__1_maxLoop_1_0 = (person, other);
+                var row__1_maxLoop_1_0 = Table.NoRow;
+                for (var bucket__1_maxLoop_1_0=key__1_maxLoop_1_0.GetHashCode()&Affinity__0_1_key.Mask; Affinity__0_1_key.Buckets[bucket__1_maxLoop_1_0].row != Table.NoRow; bucket__1_maxLoop_1_0 = (bucket__1_maxLoop_1_0+1)&Affinity__0_1_key.Mask)
+                    if (Affinity__0_1_key.Buckets[bucket__1_maxLoop_1_0].key == key__1_maxLoop_1_0)
                     {
-                        row__2_maxLoop_1_0 = Affinity__0_1_key.Buckets[bucket__2_maxLoop_1_0].row;
+                        row__1_maxLoop_1_0 = Affinity__0_1_key.Buckets[bucket__1_maxLoop_1_0].row;
                         break;
                     }
-                if (row__2_maxLoop_1_0 == Table.NoRow) goto firstOFBranch1__2_maxLoop_1;
-                ref var data__2_maxLoop_1_0 = ref Affinity.Data[row__2_maxLoop_1_0];
-                affinity = data__2_maxLoop_1_0.Item3;
-                goto firstOfSuccess__2_maxLoop_1;
+                if (row__1_maxLoop_1_0 == Table.NoRow) goto firstOFBranch1__1_maxLoop_1;
+                ref var data__1_maxLoop_1_0 = ref Affinity.Data[row__1_maxLoop_1_0];
+                affinity = data__1_maxLoop_1_0.Item3;
+                goto firstOfSuccess__1_maxLoop_1;
 
-                firstOFBranch1__2_maxLoop_1:
+                firstOFBranch1__1_maxLoop_1:
                 // affinity == PersonPersonAffinity(person, other)
                 affinity = PersonPersonAffinityImplementation(person, other);
-                goto firstOfSuccess__2_maxLoop_1;
+                goto firstOfSuccess__1_maxLoop_1;
 
-                firstOfSuccess__2_maxLoop_1: ;
+                firstOfSuccess__1_maxLoop_1: ;
 
-                if (!gotOne__2 || affinity > bestaffinity__2)
+                if (!gotOne__1 || affinity > bestaffinity__1)
                 {
-                    gotOne__2 = true;
-                    bestother__2 = other;
-                    bestaffinity__2 = affinity;
+                    gotOne__1 = true;
+                    bestother__1 = other;
+                    bestaffinity__1 = affinity;
                 }
-                goto restart__2_maxLoop_0;
+                goto restart__1_maxLoop_0;
 
-                maxDone__2:
-                if (!gotOne__2) goto restart__0;
-                other = bestother__2;
-                affinity = bestaffinity__2;
+                maxDone__1:
+                if (!gotOne__1) goto restart__0;
+                other = bestother__1;
+                affinity = bestaffinity__1;
 
                 // FirstOf[TED.Interpreter.Goal[]]
                 // Affinity[in other,in person,out otherAffinity]
-                var key__3_0 = (other, person);
-                var row__3_0 = Table.NoRow;
-                for (var bucket__3_0=key__3_0.GetHashCode()&Affinity__0_1_key.Mask; Affinity__0_1_key.Buckets[bucket__3_0].row != Table.NoRow; bucket__3_0 = (bucket__3_0+1)&Affinity__0_1_key.Mask)
-                    if (Affinity__0_1_key.Buckets[bucket__3_0].key == key__3_0)
+                var key__2_0 = (other, person);
+                var row__2_0 = Table.NoRow;
+                for (var bucket__2_0=key__2_0.GetHashCode()&Affinity__0_1_key.Mask; Affinity__0_1_key.Buckets[bucket__2_0].row != Table.NoRow; bucket__2_0 = (bucket__2_0+1)&Affinity__0_1_key.Mask)
+                    if (Affinity__0_1_key.Buckets[bucket__2_0].key == key__2_0)
                     {
-                        row__3_0 = Affinity__0_1_key.Buckets[bucket__3_0].row;
+                        row__2_0 = Affinity__0_1_key.Buckets[bucket__2_0].row;
                         break;
                     }
-                if (row__3_0 == Table.NoRow) goto firstOFBranch1__3;
-                ref var data__3_0 = ref Affinity.Data[row__3_0];
-                otherAffinity = data__3_0.Item3;
-                goto firstOfSuccess__3;
+                if (row__2_0 == Table.NoRow) goto firstOFBranch1__2;
+                ref var data__2_0 = ref Affinity.Data[row__2_0];
+                otherAffinity = data__2_0.Item3;
+                goto firstOfSuccess__2;
 
-                firstOFBranch1__3:
+                firstOFBranch1__2:
                 // otherAffinity == PersonPersonAffinity(other, person)
                 otherAffinity = PersonPersonAffinityImplementation(other, person);
-                goto firstOfSuccess__3;
+                goto firstOfSuccess__2;
 
-                firstOfSuccess__3: ;
+                firstOfSuccess__2: ;
 
                 // outcome == Interact(person, other, affinity, otherAffinity)
                 outcome = InteractImplementation(person, other, affinity, otherAffinity);
@@ -222,7 +211,6 @@ namespace Scripts.Simulator
                 Person person;
                 Person other;
                 float affinity;
-                float otherAffinity;
                 Outcome outcome;
                 float temp0;
 
@@ -234,7 +222,6 @@ namespace Scripts.Simulator
                 person = data__0.Item1;
                 other = data__0.Item2;
                 affinity = data__0.Item3;
-                otherAffinity = data__0.Item4;
                 outcome = data__0.Item5;
 
                 // temp0 == affinity+ActorOutcome(outcome)
@@ -251,7 +238,6 @@ namespace Scripts.Simulator
             {
                 Person other;
                 Person person;
-                float _Single0;
                 float affinity;
                 Outcome outcome;
                 float temp1;
@@ -263,7 +249,6 @@ namespace Scripts.Simulator
                 ref var data__0 = ref InteractedWith.Data[row__0];
                 other = data__0.Item1;
                 person = data__0.Item2;
-                _Single0 = data__0.Item3;
                 affinity = data__0.Item4;
                 outcome = data__0.Item5;
 
@@ -289,7 +274,6 @@ namespace Scripts.Simulator
             Affinity = (Table<ValueTuple<Person,Person,float>>)program["Affinity"].TableUntyped;
             Affinity__0_1_key = (KeyIndex<ValueTuple<Person,Person,float>,ValueTuple<Person,Person>>)Affinity.IndexFor(0, 1);
             WhereTheyAre = (Table<ValueTuple<Person,Location>>)program["WhereTheyAre"].TableUntyped;
-            WhereTheyAre__0_key = (KeyIndex<ValueTuple<Person,Location>,Person>)WhereTheyAre.IndexFor(0);
             WhereTheyAre__1 = (GeneralIndex<ValueTuple<Person,Location>,Location>)WhereTheyAre.IndexFor(1);
             InteractedWith = (Table<ValueTuple<Person,Person,float,float,Outcome>>)program["InteractedWith"].TableUntyped;
             Affinity__add = (Table<ValueTuple<Person,Person,float>>)program["Affinity__add"].TableUntyped;
@@ -301,7 +285,6 @@ namespace Scripts.Simulator
         public static Table<ValueTuple<Person,Person,float>> Affinity;
         public static KeyIndex<ValueTuple<Person,Person,float>,ValueTuple<Person,Person>> Affinity__0_1_key;
         public static Table<ValueTuple<Person,Location>> WhereTheyAre;
-        public static KeyIndex<ValueTuple<Person,Location>,Person> WhereTheyAre__0_key;
         public static GeneralIndex<ValueTuple<Person,Location>,Location> WhereTheyAre__1;
         public static Table<ValueTuple<Person,Person,float,float,Outcome>> InteractedWith;
         public static Table<ValueTuple<Person,Person,float>> Affinity__add;

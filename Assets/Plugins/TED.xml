@@ -31,6 +31,11 @@
             Any additional "using X;", "using static X;", etc. declarations you want to include
             </summary>
         </member>
+        <member name="M:TED.Compiler.Compiler.IsSingleton(TED.Interpreter.IVariable)">
+            <summary>
+            True if there is only reference to the specified variable.  That means it can be ignored.
+            </summary>
+        </member>
         <member name="M:TED.Compiler.Compiler.WithLiftedScope(System.Action)">
             <summary>
             Compile the code compiled by generator, but move any variables it declares using LocalVariable to the beginning.
@@ -4899,6 +4904,17 @@
             is also a generic type, and so AnyTerm is the most immediate ancestor that's a parent to all Vars.
             </summary>
         </member>
+        <member name="M:TED.Preprocessing.GoalAnalyzer.ReferenceCount(TED.Interpreter.IVariable)">
+            <summary>
+            Number of uses of the specified variable in this rule.
+            </summary>
+        </member>
+        <member name="P:TED.Preprocessing.GoalAnalyzer.Singletons">
+            <summary>
+            Set of singleton variables (variables used only once) in the rule.
+            These can be safely ignored in matching since their values will never be used.
+            </summary>
+        </member>
         <member name="F:TED.Preprocessing.GoalAnalyzer.BoundVariables">
             <summary>
             Variables that are currently bound to values
@@ -4924,12 +4940,6 @@
             <param name="term">The term</param>
             <returns>A MatchOperation with the right opcode (read, write, or constant) and ValueCell to match this argument to this call.</returns>
             <exception cref="T:System.InvalidOperationException">If this is a term that can't be used as an argument</exception>
-        </member>
-        <member name="M:TED.Preprocessing.GoalAnalyzer.MakeWrite``1(TED.Var{``0})">
-            <summary>
-            Forcibly make a MatchOperation that will write v, even when v is already instantiated.
-            Used for iteration constructs like Maximize.
-            </summary>
         </member>
         <member name="M:TED.Preprocessing.GoalAnalyzer.VariableValueCells">
             <summary>
