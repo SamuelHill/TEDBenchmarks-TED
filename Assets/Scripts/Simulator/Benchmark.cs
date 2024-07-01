@@ -62,16 +62,16 @@ namespace Scripts.Simulator {
             Simulation.BeginPredicates();
             var Person = Predicate("Person", person);
             var Location = Predicate("Location", location);
-            var WorkLocation = Predicate("WorkLocation", person, location);
+            var WorkLocation = Predicate("WorkLocation", person.Key, location);
 
             _affinity = Predicate("Affinity", person, other, affinity).JointKey(person, other);
             _affinity.Overwrite = true;
             var Affinity = Definition("Affinity", person, other, affinity).Is(FirstOf[_affinity, PersonPersonAffinity[person, other, affinity]]);
 
             _whereTheyAre = Predicate("WhereTheyAre", person, location.Indexed)
-               .If(IsAM[false], Person, RandomMood[mood],
+               .If(IsDaytime[true], Person, RandomMood[mood],
                    Maximal(location, affinity, Location & PersonLocationAffinity[person, mood, location, affinity]))
-               .If(IsAM[true], WorkLocation);
+               .If(IsDaytime[false], WorkLocation);
             _interactedWith = Predicate("InteractedWith", person, other, affinity, otherAffinity, outcome)
                .If(_whereTheyAre, Maximal(other, affinity, _whereTheyAre[other, location] & Affinity[person, other, affinity]),
                    Affinity[other, person, otherAffinity], Interact[person, other, affinity, otherAffinity, outcome]);
@@ -98,6 +98,7 @@ namespace Scripts.Simulator {
             Stopwatch.Reset();
             Stopwatch.Start();
             Simulation.Update();
+            // Simulation.UpdateAsync().Wait();
             Stopwatch.Stop();
             UpdateTime = (15*UpdateTime+Stopwatch.Elapsed.TotalMilliseconds)/16;
 

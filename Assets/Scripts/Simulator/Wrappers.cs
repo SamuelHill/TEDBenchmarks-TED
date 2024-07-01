@@ -26,7 +26,7 @@ namespace Scripts.Simulator {
         
         public static Function<Fingerprint> RandomMood = new(nameof(RandomMood), Fingerprint.Mood, false) {NameForCompilation = "Fingerprint.Mood"};
         
-        public static bool IsAMImplementation() => Clock.ClockTick % 2 == 1;
-        public static Function<bool> IsAM = new(nameof(IsAM), IsAMImplementation) {NameForCompilation = nameof(IsAMImplementation)};
+        public static bool IsDaytimeImplementation() => Clock.ClockTick % 2 == 1;
+        public static Function<bool> IsDaytime = new(nameof(IsDaytime), IsDaytimeImplementation) {NameForCompilation = nameof(IsDaytimeImplementation)};
     }
 }

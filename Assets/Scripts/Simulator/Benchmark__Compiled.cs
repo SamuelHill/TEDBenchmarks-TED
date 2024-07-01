@@ -22,15 +22,15 @@ namespace Scripts.Simulator
 
         public static void WhereTheyAre__CompiledUpdate()
         {
-            // WhereTheyAre[in person,in location].If(False == IsAM, Person[out person], mood == RandomMood, Maximal[in location,in affinity,And[TED.Interpreter.Goal[]]])
+            // WhereTheyAre[in person,in location].If(True == IsDaytime, Person[out person], mood == RandomMood, Maximal[in location,in affinity,And[TED.Interpreter.Goal[]]])
             {
                 Person person;
                 Fingerprint mood;
                 Location location;
                 float affinity;
 
-                // False == IsAM
-                if (false != IsAMImplementation()) goto rule2;
+                // True == IsDaytime
+                if (true != IsDaytimeImplementation()) goto rule2;
 
                 // Person[out person]
                 var row__1 = unchecked((uint)-1);
@@ -78,13 +78,13 @@ namespace Scripts.Simulator
 
             rule2:;
 
-            // WhereTheyAre[in person,in location].If(True == IsAM, WorkLocation[out person,out location])
+            // WhereTheyAre[in person,in location].If(False == IsDaytime, WorkLocation[out person,out location])
             {
                 Person person;
                 Location location;
 
-                // True == IsAM
-                if (true != IsAMImplementation()) goto end;
+                // False == IsDaytime
+                if (false != IsDaytimeImplementation()) goto end;
 
                 // WorkLocation[out person,out location]
                 var row__1 = unchecked((uint)-1);
@@ -271,6 +271,7 @@ namespace Scripts.Simulator
             Person = (Table<Person>)program["Person"].TableUntyped;
             Location = (Table<Location>)program["Location"].TableUntyped;
             WorkLocation = (Table<ValueTuple<Person,Location>>)program["WorkLocation"].TableUntyped;
+            WorkLocation__0_key = (KeyIndex<ValueTuple<Person,Location>,Person>)WorkLocation.IndexFor(0);
             Affinity = (Table<ValueTuple<Person,Person,float>>)program["Affinity"].TableUntyped;
             Affinity__0_1_key = (KeyIndex<ValueTuple<Person,Person,float>,ValueTuple<Person,Person>>)Affinity.IndexFor(0, 1);
             WhereTheyAre = (Table<ValueTuple<Person,Location>>)program["WhereTheyAre"].TableUntyped;
@@ -282,6 +283,7 @@ namespace Scripts.Simulator
         public static Table<Person> Person;
         public static Table<Location> Location;
         public static Table<ValueTuple<Person,Location>> WorkLocation;
+        public static KeyIndex<ValueTuple<Person,Location>,Person> WorkLocation__0_key;
         public static Table<ValueTuple<Person,Person,float>> Affinity;
         public static KeyIndex<ValueTuple<Person,Person,float>,ValueTuple<Person,Person>> Affinity__0_1_key;
         public static Table<ValueTuple<Person,Location>> WhereTheyAre;
