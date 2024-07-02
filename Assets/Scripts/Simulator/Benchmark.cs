@@ -101,14 +101,21 @@ namespace Scripts.Simulator {
             // Simulation.UpdateAsync().Wait();
             Stopwatch.Stop();
             UpdateTime = (15*UpdateTime+Stopwatch.Elapsed.TotalMilliseconds)/16;
-
+            
             if (!RecordingPerformance) return;
-            PerformanceData.Add((ClockTick - InitialClockTick, Stopwatch.Elapsed.TotalMilliseconds));
-            if (ClockTick % 100 == 1) {
+            switch (ClockTick) {
+                case 2000: {
+                    _affinity.Table.Clear();
+                    return;
+                }
+                case < 3000: return;
+            }
+            PerformanceData.Add((ClockTick, Stopwatch.Elapsed.TotalMilliseconds));
+            if (ClockTick == 4000) {
                 using var file = AppendText("PerformanceData.csv");
-                foreach ((var clock, var execution) in PerformanceData)
-                    file.WriteLine($"{clock}, {execution}");
+                foreach ((var clock, var execution) in PerformanceData) file.WriteLine($"{clock}, {execution}");
                 PerformanceData.Clear();
+                RecordingPerformance = false;
             }
         }
     }

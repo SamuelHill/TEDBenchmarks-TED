@@ -8,9 +8,7 @@ namespace Scripts.Time {
     /// Internal clock, keeps time during a simulation by ticking along with Simulator.Update
     /// </summary>
     public static class Clock {
-        private const ushort NumTicks = 672;
-        private const ushort PrimordialOffset = 100; // years before start that TimePoints can exist at
-        internal const uint InitialClockTick = NumTicks * PrimordialOffset;
+        internal const uint InitialClockTick = 0;
 
         public static uint ClockTick;
         public static void Tick() => ClockTick++;
