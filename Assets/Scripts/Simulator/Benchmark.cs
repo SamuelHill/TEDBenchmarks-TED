@@ -82,7 +82,7 @@ namespace Scripts.Simulator {
 
             Simulation.Compile("Scripts.Simulator",
                 additionalDeclarations: new [] { "using Scripts.ValueTypes;", "using static Scripts.ValueTypes.Interactions;", "using static Scripts.Simulator.Wrappers;" });
-            // TED.Compiler.Compiler.Link(Simulation, true);
+            TED.Compiler.Compiler.Link(Simulation, true);
             
             Person.AddRows(Enumerable.Range(0, 2000).Select(s => new Person("Bob", $"Mc{s}", RngForInitialization)));
             Location.AddRows(Enumerable.Range(0, 100).Select(s => new Location($"{s}")));
