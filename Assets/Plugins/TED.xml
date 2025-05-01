@@ -31,6 +31,11 @@
             Any additional "using X;", "using static X;", etc. declarations you want to include
             </summary>
         </member>
+        <member name="M:TED.Compiler.Compiler.IsSingleton(TED.Interpreter.IVariable)">
+            <summary>
+            True if there is only reference to the specified variable.  That means it can be ignored.
+            </summary>
+        </member>
         <member name="M:TED.Compiler.Compiler.WithLiftedScope(System.Action)">
             <summary>
             Compile the code compiled by generator, but move any variables it declares using LocalVariable to the beginning.
@@ -55,7 +60,7 @@
         </member>
         <member name="M:TED.Compiler.Compiler.Field(System.String,System.Type,System.String)">
             <summary>
-            Add the specified field with the specified type an initializer to the class containing the compiled code.
+            Add the specified field with the specified type and initializer to the class containing the compiled code.
             This can be used to link to outside data (e.g. tables) or to retain state from update to update (e.g. RNGs).
             </summary>
             <param name="name">Name to give to the field</param>
@@ -89,7 +94,7 @@
             <returns>Expression that computes the vlaue of the pattern (usually a tuple)</returns>
             <exception cref="T:System.InvalidOperationException">If pattern is not fully instantiated</exception>
         </member>
-        <member name="M:TED.Compiler.Compiler.CompilePatternMatch(System.String,TED.Interpreter.IPattern,TED.Compiler.Continuation)">
+        <member name="M:TED.Compiler.Compiler.CompilePatternMatch(System.String,TED.Interpreter.IPattern,TED.Compiler.Continuation,System.Int32[])">
             <summary>
             Emit code to match tupleVar to the specified pattern.
             This will update variables or compare them to tuple values, depending on the read/write modes of the pattern's arguments.
@@ -97,6 +102,7 @@
             <param name="tupleVar">Name of the variable containing the tuple</param>
             <param name="p">Pattern to match the tuple to</param>
             <param name="fail">Where to branch to if the match fails (falls through for success)</param>
+            <param name="ignoreColumns">Columns not to generate matching/storing code for</param>
         </member>
         <member name="M:TED.Compiler.Compiler.CompileMatch(System.String,TED.Interpreter.IMatchOperation,TED.Compiler.Continuation)">
             <summary>
@@ -113,6 +119,19 @@
             </summary>
             <param name="controlExpression">Integer variable containing the number of the target to branch to</param>
             <param name="targets">The targets, in order</param>
+        </member>
+        <member name="F:TED.Compiler.Compiler.nextConstantUid">
+            <summary>
+            Counter used to add uids to fields used to cache results of ToSourceExpression.
+            </summary>
+        </member>
+        <member name="M:TED.Compiler.Compiler.DeclareExpressionGeneratorForType(System.Type,System.Func{System.Object,TED.Compiler.Compiler,System.ValueTuple{System.String,System.String}})">
+            <summary>
+            Specify method to use to translate run-time data objects into source code.  This doesn't need to generate a C#
+            literal.  It can be any C# source code.
+            </summary>
+            <param name="type">Data type to specify the generator for</param>
+            <param name="generator">Method to generate source code that will evaluate to the specified object, together with the name for a field to hold the cached value of this expression.  If the name is null, it will not be cached.</param>
         </member>
         <member name="T:TED.Constant`1">
             <summary>
@@ -676,6 +695,11 @@
         <member name="F:TED.Function.Name">
             <summary>
             Name, for debugging purposes
+            </summary>
+        </member>
+        <member name="F:TED.Function.NameForCompilation">
+            <summary>
+            If defined, when compiling calls to this, the generated C# code will be a call to the C# function with this name.
             </summary>
         </member>
         <member name="M:TED.Function.#ctor(System.String,System.Boolean)">
@@ -1639,6 +1663,126 @@
         <member name="P:TED.Interpreter.IPattern.Arguments">
             <summary>
             The MatchOperation[T] operations for each of the arguments in the pattern.
+            </summary>
+        </member>
+        <member name="T:TED.Interpreter.IPredicate`1">
+            <summary>
+            Interface to abstract across predicates and definitions
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`1.Name">
+            <summary>
+            Name of the underlying predicate
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`1.Item(TED.Term{`0})">
+            <summary>
+            Call the predicate with the specified arguments
+            </summary>
+        </member>
+        <member name="T:TED.Interpreter.IPredicate`2">
+            <summary>
+            Interface to abstract across predicates and definitions
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`2.Name">
+            <summary>
+            Name of the underlying predicate
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`2.Item(TED.Term{`0},TED.Term{`1})">
+            <summary>
+            Call the predicate with the specified arguments
+            </summary>
+        </member>
+        <member name="T:TED.Interpreter.IPredicate`3">
+            <summary>
+            Interface to abstract across predicates and definitions
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`3.Name">
+            <summary>
+            Name of the underlying predicate
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`3.Item(TED.Term{`0},TED.Term{`1},TED.Term{`2})">
+            <summary>
+            Call the predicate with the specified arguments
+            </summary>
+        </member>
+        <member name="T:TED.Interpreter.IPredicate`4">
+            <summary>
+            Interface to abstract across predicates and definitions
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`4.Name">
+            <summary>
+            Name of the underlying predicate
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`4.Item(TED.Term{`0},TED.Term{`1},TED.Term{`2},TED.Term{`3})">
+            <summary>
+            Call the predicate with the specified arguments
+            </summary>
+        </member>
+        <member name="T:TED.Interpreter.IPredicate`5">
+            <summary>
+            Interface to abstract across predicates and definitions
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`5.Name">
+            <summary>
+            Name of the underlying predicate
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`5.Item(TED.Term{`0},TED.Term{`1},TED.Term{`2},TED.Term{`3},TED.Term{`4})">
+            <summary>
+            Call the predicate with the specified arguments
+            </summary>
+        </member>
+        <member name="T:TED.Interpreter.IPredicate`6">
+            <summary>
+            Interface to abstract across predicates and definitions
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`6.Name">
+            <summary>
+            Name of the underlying predicate
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`6.Item(TED.Term{`0},TED.Term{`1},TED.Term{`2},TED.Term{`3},TED.Term{`4},TED.Term{`5})">
+            <summary>
+            Call the predicate with the specified arguments
+            </summary>
+        </member>
+        <member name="T:TED.Interpreter.IPredicate`7">
+            <summary>
+            Interface to abstract across predicates and definitions
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`7.Name">
+            <summary>
+            Name of the underlying predicate
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`7.Item(TED.Term{`0},TED.Term{`1},TED.Term{`2},TED.Term{`3},TED.Term{`4},TED.Term{`5},TED.Term{`6})">
+            <summary>
+            Call the predicate with the specified arguments
+            </summary>
+        </member>
+        <member name="T:TED.Interpreter.IPredicate`8">
+            <summary>
+            Interface to abstract across predicates and definitions
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`8.Name">
+            <summary>
+            Name of the underlying predicate
+            </summary>
+        </member>
+        <member name="P:TED.Interpreter.IPredicate`8.Item(TED.Term{`0},TED.Term{`1},TED.Term{`2},TED.Term{`3},TED.Term{`4},TED.Term{`5},TED.Term{`6},TED.Term{`7})">
+            <summary>
+            Call the predicate with the specified arguments
             </summary>
         </member>
         <member name="T:TED.Interpreter.IVariable">
@@ -3095,7 +3239,7 @@
             Value stored in the cell, typed as object
             </summary>
         </member>
-        <member name="P:TED.Interpreter.ValueCell.ReadExpression">
+        <member name="M:TED.Interpreter.ValueCell.ReadExpression(TED.Compiler.Compiler)">
             <summary>
             Expression to use when reading from this in compiled code.  This will either be a variable name or, for a constant, a C# literal.
             </summary>
@@ -3167,6 +3311,11 @@
         <member name="F:TED.Language.Once">
             <summary>
             True if argument is true, but blocks backtracking.
+            </summary>
+        </member>
+        <member name="F:TED.Language.LimitSolutions">
+            <summary>
+            Solves goal argument, but gives up after a specified number of solutions
             </summary>
         </member>
         <member name="F:TED.Language.Not">
@@ -4849,6 +4998,36 @@
             <returns>New predicate that is the closure</returns>
             <exception cref="T:System.InvalidOperationException">If input predicate is not indexed on the first argument</exception>
         </member>
+        <member name="M:TED.Language.Lambda``1(TED.Var{``0},TED.Interpreter.Goal[])">
+            <summary>
+            Makes an anonymous definition
+            </summary>
+        </member>
+        <member name="M:TED.Language.Lambda``2(TED.Var{``0},TED.Var{``1},TED.Interpreter.Goal[])">
+            <summary>
+            Makes an anonymous definition
+            </summary>
+        </member>
+        <member name="M:TED.Language.Lambda``3(TED.Var{``0},TED.Var{``1},TED.Var{``2},TED.Interpreter.Goal[])">
+            <summary>
+            Makes an anonymous definition
+            </summary>
+        </member>
+        <member name="M:TED.Language.Lambda``4(TED.Var{``0},TED.Var{``1},TED.Var{``2},TED.Var{``3},TED.Interpreter.Goal[])">
+            <summary>
+            Makes an anonymous definition
+            </summary>
+        </member>
+        <member name="M:TED.Language.Lambda``5(TED.Var{``0},TED.Var{``1},TED.Var{``2},TED.Var{``3},TED.Var{``4},TED.Interpreter.Goal[])">
+            <summary>
+            Makes an anonymous definition
+            </summary>
+        </member>
+        <member name="M:TED.Language.Lambda``6(TED.Var{``0},TED.Var{``1},TED.Var{``2},TED.Var{``3},TED.Var{``4},TED.Var{``5},TED.Interpreter.Goal[])">
+            <summary>
+            Makes an anonymous definition
+            </summary>
+        </member>
         <member name="T:TED.Predicate">
             <summary>
             Untyped base class for all predicates
@@ -4898,6 +5077,17 @@
             is also a generic type, and so AnyTerm is the most immediate ancestor that's a parent to all Vars.
             </summary>
         </member>
+        <member name="M:TED.Preprocessing.GoalAnalyzer.ReferenceCount(TED.Interpreter.IVariable)">
+            <summary>
+            Number of uses of the specified variable in this rule.
+            </summary>
+        </member>
+        <member name="P:TED.Preprocessing.GoalAnalyzer.Singletons">
+            <summary>
+            Set of singleton variables (variables used only once) in the rule.
+            These can be safely ignored in matching since their values will never be used.
+            </summary>
+        </member>
         <member name="F:TED.Preprocessing.GoalAnalyzer.BoundVariables">
             <summary>
             Variables that are currently bound to values
@@ -4923,12 +5113,6 @@
             <param name="term">The term</param>
             <returns>A MatchOperation with the right opcode (read, write, or constant) and ValueCell to match this argument to this call.</returns>
             <exception cref="T:System.InvalidOperationException">If this is a term that can't be used as an argument</exception>
-        </member>
-        <member name="M:TED.Preprocessing.GoalAnalyzer.MakeWrite``1(TED.Var{``0})">
-            <summary>
-            Forcibly make a MatchOperation that will write v, even when v is already instantiated.
-            Used for iteration constructs like Maximize.
-            </summary>
         </member>
         <member name="M:TED.Preprocessing.GoalAnalyzer.VariableValueCells">
             <summary>
@@ -5135,6 +5319,19 @@
             </summary>
             <typeparam name="T">Element type of the collection</typeparam>
         </member>
+        <member name="T:TED.Primitives.LimitSolutionsPrimitive">
+            <summary>
+            Generates only the first solution of a goal
+            </summary>
+        </member>
+        <member name="F:TED.Primitives.LimitSolutionsPrimitive.Singleton">
+            <summary>
+            The object implementing LimitSolutions
+            </summary>
+        </member>
+        <member name="M:TED.Primitives.LimitSolutionsPrimitive.MakeCall(TED.Primitives.PrimitivePredicate{System.Int32,TED.Interpreter.Goal}.Goal,TED.Preprocessing.GoalAnalyzer)">
+            <inheritdoc />
+        </member>
         <member name="T:TED.Primitives.MaximalPrimitive`2">
             <summary>
             Implements Maximal and Minimal Primitives with one argument to check against
@@ -5165,12 +5362,12 @@
         </member>
         <member name="T:TED.Primitives.OncePrimitive">
             <summary>
-            Implements negation of a goal
+            Generates only the first solution of a goal
             </summary>
         </member>
         <member name="F:TED.Primitives.OncePrimitive.Singleton">
             <summary>
-            The object implementing Not
+            The object implementing Once
             </summary>
         </member>
         <member name="M:TED.Primitives.OncePrimitive.MakeCall(TED.Primitives.PrimitivePredicate{TED.Interpreter.Goal}.Goal,TED.Preprocessing.GoalAnalyzer)">
@@ -6572,6 +6769,11 @@
         <member name="P:TED.TablePredicate.RuleExecutionTime">
             <summary>
             Combined average execution time of all the rules for this predicate.
+            </summary>
+        </member>
+        <member name="P:TED.TablePredicate.RuleExecutionTimes">
+            <summary>
+            Combined average execution time for each rule (regardless of predicate).
             </summary>
         </member>
         <member name="P:TED.TablePredicate.IsIntensional">
@@ -8567,8 +8769,9 @@
             <typeparam name="TRow">Type of the table rows.  This will be a tuple type unless it's a single-column table</typeparam>
             <typeparam name="TColumn">Type of the column we're indexing by</typeparam>
         </member>
-        <member name="F:TED.Tables.GeneralIndex`2.buckets">
+        <member name="F:TED.Tables.GeneralIndex`2.Buckets">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             Buckets for the hash table.  These contain a column value and the index of the first row in the
             linked list of rows having that column value.  The row after it is stored in nextRow[firstRow].
             Empty buckets have firstRow == AnyTable.NoRow.
@@ -8576,6 +8779,7 @@
         </member>
         <member name="F:TED.Tables.GeneralIndex`2.NextRow">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             Next cells in the linked lists.
             All the rows with a given column value are stored in a linked list, starting with the row indicated
             in the firstRow field of the hashtable bucket for the column value.  The successor to row i is stored in
@@ -8595,8 +8799,9 @@
             We need to track this since it's possible for the table to fill with deletions, making lookups loop infinitely.
             </summary>
         </member>
-        <member name="F:TED.Tables.GeneralIndex`2.mask">
+        <member name="F:TED.Tables.GeneralIndex`2.Mask">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             The length of the buckets array is always a power of 2.  Mask is the length-1, so we can easily
             project a hash value into a bucket number by and'ing the hash value with the mask.
             </summary>
@@ -8697,13 +8902,15 @@
             <typeparam name="TRow">Type of the rows of the table; this will be a tuple type unless it is a single-column table</typeparam>
             <typeparam name="TKey">Type of the column we're indexing on</typeparam>
         </member>
-        <member name="F:TED.Tables.KeyIndex`2.buckets">
+        <member name="F:TED.Tables.KeyIndex`2.Buckets">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             Hash table buckets mapping key values to row numbers
             </summary>
         </member>
-        <member name="F:TED.Tables.KeyIndex`2.mask">
+        <member name="F:TED.Tables.KeyIndex`2.Mask">
             <summary>
+            INTERNAL: Do not use; exposed only for the benefit of compiled code
             Mask to and with a hash to get a bucket number
             </summary>
         </member>
@@ -9697,6 +9904,11 @@
         <member name="M:TED.Utilities.Random.InRangeExclusive(System.Random,System.Int32,System.Int32)">
             <summary>
             Return a random integer from start to end-1.
+            </summary>
+        </member>
+        <member name="M:TED.Utilities.Random.Shuffle``1(System.Collections.Generic.IEnumerable{``0},System.Random)">
+            <summary>
+            Return the input sequence shuffled.
             </summary>
         </member>
         <member name="T:TED.Utilities.ReflectionUtilities">
